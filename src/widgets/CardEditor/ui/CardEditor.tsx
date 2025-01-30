@@ -84,47 +84,43 @@ export const CardEditor = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!canvas) return;
 
+      const activeObject = canvas.getActiveObject();
+      if (!activeObject) return;
+
+      // 텍스트 편집 중일 때는 기본 동작만 허용
+      if (activeObject instanceof IText && (activeObject as any).isEditing) {
+        return;
+      }
+
       // Delete
       if (e.key === "Delete" || e.key === "Backspace") {
-        const activeObject = canvas.getActiveObject();
-        if (activeObject) {
-          canvas.remove(activeObject);
-          canvas.renderAll();
-          setContextMenu({ x: 0, y: 0, visible: false });
-        }
+        canvas.remove(activeObject);
+        canvas.renderAll();
+        setContextMenu({ x: 0, y: 0, visible: false });
       }
 
       // Copy
       if ((e.ctrlKey || e.metaKey) && e.key === "c") {
-        const activeObject = canvas.getActiveObject();
-        if (activeObject) {
-          activeObject.clone((cloned: any) => {
-            canvas.clipboard = cloned;
-          });
-        }
+        activeObject.clone((cloned: any) => {
+          canvas.clipboard = cloned;
+        });
       }
 
       // Paste
       if ((e.ctrlKey || e.metaKey) && e.key === "v") {
-        if (canvas.clipboard) {
-          canvas.clipboard.clone((clonedObj: any) => {
-            canvas.discardActiveObject();
-            clonedObj.set({
-              left: clonedObj.left + 10,
-              top: clonedObj.top + 10,
-              evented: true,
-            });
-            if (clonedObj.type === "activeSelection") {
-              clonedObj.canvas = canvas;
-              clonedObj.forEachObject((obj: any) => canvas.add(obj));
-              clonedObj.setCoords();
-            } else {
-              canvas.add(clonedObj);
-            }
-            canvas.setActiveObject(clonedObj);
-            canvas.renderAll();
+        if (!canvas.clipboard) return;
+
+        canvas.clipboard.clone((cloned: any) => {
+          canvas.discardActiveObject();
+          cloned.set({
+            left: cloned.left + 10,
+            top: cloned.top + 10,
+            evented: true,
           });
-        }
+          canvas.add(cloned);
+          canvas.setActiveObject(cloned);
+          canvas.renderAll();
+        });
       }
     };
 
