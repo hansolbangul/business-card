@@ -1,31 +1,35 @@
-'use client';
+"use client";
 
-import { useCanvasStore } from '@/entities/canvas/model/store';
+import { useCanvasStore } from "@/entities/canvas/model/store";
 
 export const LayerControls = () => {
   const { canvas, activeObject } = useCanvasStore();
 
-  if (!activeObject || !canvas) return null;
-
   const bringForward = () => {
-    activeObject.bringForward();
+    if (!canvas || !activeObject) return;
+    canvas.bringObjectForward(activeObject);
     canvas.renderAll();
   };
 
   const sendBackward = () => {
-    activeObject.sendBackward();
+    if (!canvas || !activeObject) return;
+    canvas.sendObjectBackwards(activeObject);
     canvas.renderAll();
   };
 
   const bringToFront = () => {
-    activeObject.bringToFront();
+    if (!canvas || !activeObject) return;
+    canvas.bringObjectToFront(activeObject);
     canvas.renderAll();
   };
 
   const sendToBack = () => {
-    activeObject.sendToBack();
+    if (!canvas || !activeObject) return;
+    canvas.sendObjectToBack(activeObject);
     canvas.renderAll();
   };
+
+  if (!activeObject) return null;
 
   return (
     <div className="space-y-2">
