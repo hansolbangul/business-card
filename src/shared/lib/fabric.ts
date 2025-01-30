@@ -7,6 +7,7 @@ import {
   FabricObject,
   Group,
   Circle,
+  ActiveSelection,
 } from "fabric";
 
 export class Canvas extends FabricCanvas {
@@ -50,4 +51,12 @@ export class IText extends FabricIText {
   }
 }
 
-export { FabricImage, loadSVGFromString, util, FabricObject, Group, Circle };
+export {
+  FabricImage,
+  loadSVGFromString,
+  util,
+  FabricObject,
+  Group,
+  Circle,
+  ActiveSelection,
+};

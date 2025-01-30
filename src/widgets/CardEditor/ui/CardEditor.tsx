@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Canvas, IText } from "@/shared/lib/fabric";
+import { Canvas, IText, ActiveSelection } from "@/shared/lib/fabric";
 import { useCanvasStore } from "@/entities/canvas/model/store";
 import { ContextMenu } from "@/shared/ui/ContextMenu";
 import { AnimatePresence } from "framer-motion";
@@ -131,6 +131,26 @@ export const CardEditor = () => {
         return;
       }
 
+      // Delete
+      if (e.key === "Delete" || e.key === "Backspace") {
+        e.preventDefault();
+
+        if (activeObject.type === "activeselection") {
+          // 다중 선택된 객체들을 모두 삭제
+          const activeSelection = activeObject as ActiveSelection;
+
+          const objects = [...activeSelection.getObjects()];
+          activeSelection.removeAll();
+          objects.forEach((obj) => canvas.remove(obj));
+        } else {
+          // 단일 객체 삭제
+          canvas.remove(activeObject);
+        }
+        canvas.discardActiveObject();
+        canvas.renderAll();
+        return;
+      }
+
       // 화살표 키로 위치 미세 조정 (Shift 키와 함께 누르면 10픽셀씩 이동)
       const MOVE_STEP = e.shiftKey ? 10 : 1;
 
@@ -155,13 +175,6 @@ export const CardEditor = () => {
           activeObject.set("top", activeObject.top! + MOVE_STEP);
           canvas.renderAll();
           break;
-      }
-
-      // Delete
-      if (e.key === "Delete" || e.key === "Backspace") {
-        canvas.remove(activeObject);
-        canvas.renderAll();
-        setContextMenu({ x: 0, y: 0, visible: false });
       }
 
       // Copy
