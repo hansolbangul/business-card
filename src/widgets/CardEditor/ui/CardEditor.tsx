@@ -32,6 +32,7 @@ export const CardEditor = () => {
       width: CANVAS_WIDTH,
       height: CANVAS_HEIGHT,
       backgroundColor: "#ffffff",
+      selection: true,
     });
 
     fabricRef.current = canvas;
@@ -76,19 +77,13 @@ export const CardEditor = () => {
       }
     });
 
-    // 객체 선택 이벤트에서 자동으로 앞으로 오는 기능 제거
-    canvas.on("selection:created", (e) => {
-      const selectedObject = e.target;
-      if (selectedObject) {
-        setActiveObject(selectedObject);
-      }
+    // 선택된 객체 처리
+    canvas.on("selection:created", (e: any) => {
+      setActiveObject(e.selected[0]);
     });
 
-    canvas.on("selection:updated", (e) => {
-      const selectedObject = e.target;
-      if (selectedObject) {
-        setActiveObject(selectedObject);
-      }
+    canvas.on("selection:updated", (e: any) => {
+      setActiveObject(e.selected[0]);
     });
 
     canvas.on("selection:cleared", () => {
@@ -283,12 +278,12 @@ export const CardEditor = () => {
   return (
     <div 
       ref={wrapperRef} 
-      className="w-full h-full overflow-auto bg-white relative"
-      tabIndex={0} // 키보드 이벤트를 받을 수 있도록 설정
+      className="w-full h-full overflow-auto bg-gray-100 relative"
+      tabIndex={0}
     >
       <div className="min-h-full p-8 flex items-center justify-center">
         <div
-          className="border border-gray-200 rounded shadow-lg"
+          className="border border-gray-200 rounded shadow-lg bg-white"
           style={{
             transform: `scale(${zoom})`,
             transformOrigin: "center center",
@@ -297,7 +292,6 @@ export const CardEditor = () => {
           <canvas ref={canvasRef} className="max-w-full h-auto" />
         </div>
       </div>
-
       <AnimatePresence>
         {contextMenu.visible && (
           <ContextMenu

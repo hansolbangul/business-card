@@ -34,7 +34,7 @@ export const Sidebar = () => {
   };
 
   return (
-    <aside className="w-64 fixed left-0 top-16 bottom-0 bg-white shadow-lg border-r border-gray-200 overflow-y-auto">
+    <aside className="w-64 fixed z-10 left-0 top-16 bottom-0 bg-white shadow-lg border-r border-gray-200 overflow-y-auto">
       <div className="p-6 space-y-6">
         {/* 기본 도구 */}
         <div className="space-y-4">
