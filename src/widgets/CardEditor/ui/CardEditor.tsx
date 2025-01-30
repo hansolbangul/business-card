@@ -14,7 +14,7 @@ export const CardEditor = () => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const fabricRef = useRef<Canvas | null>(null);
   const { setCanvas, setActiveObject } = useCanvasStore();
-  const [zoom, setZoom] = useState(1);
+  const [zoom] = useState(1);
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;
@@ -326,13 +326,19 @@ export const CardEditor = () => {
     <div className="w-full h-full flex items-center justify-center bg-gray-50">
       <div
         ref={wrapperRef}
-        className="relative bg-white rounded-lg shadow-lg overflow-hidden"
-        style={{
-          width: canvasSize.width,
-          height: canvasSize.height,
-        }}
+        className="relative flex-1 flex items-center justify-center overflow-hidden bg-gray-100"
+        tabIndex={-1}
       >
-        <canvas ref={canvasRef} />
+        <div className="relative">
+          <canvas
+            ref={canvasRef}
+            className=""
+            style={{
+              width: canvasSize.width,
+              height: canvasSize.height,
+            }}
+          />
+        </div>
       </div>
       <AnimatePresence>
         {contextMenu.visible && (

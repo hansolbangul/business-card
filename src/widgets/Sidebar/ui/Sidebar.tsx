@@ -13,7 +13,8 @@ import { BackgroundControls } from "@/features/elements/ui/BackgroundControls";
 import { ImageControls } from "@/features/elements/ui/ImageControls";
 import { useCanvasStore } from "@/entities/canvas/model/store";
 import { BottomSheet } from "@/shared/ui/BottomSheet";
-import cn from "classnames";
+import { modalControl } from "@/shared/lib/modal/modalControl";
+import { ModalContent } from "@/features/elements/ui/ModalContent";
 
 interface SidebarProps {
   initialIsMobile: boolean;
@@ -38,11 +39,23 @@ export const Sidebar = ({ initialIsMobile }: SidebarProps) => {
   }, []);
 
   const openModal = (type: string) => {
+    setIsOpen(false);
     const components = {
       emoji: { component: AddEmoji, title: "이모지 추가" },
       asset: { component: AddAsset, title: "에셋 추가" },
       social: { component: AddSocialIcon, title: "소셜 아이콘 추가" },
     };
+
+    const config = components[type as keyof typeof components];
+    if (!config) return;
+
+    const { component: Component, title } = config;
+
+    modalControl.open((close) => (
+      <ModalContent close={close} title={title}>
+        <Component close={close} />
+      </ModalContent>
+    ));
   };
 
   const SidebarContent = () => (
@@ -77,6 +90,12 @@ export const Sidebar = ({ initialIsMobile }: SidebarProps) => {
         </div>
       </div>
 
+      {/* 배경 설정 */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-semibold text-gray-900">배경 설정</h2>
+        <BackgroundControls />
+      </div>
+
       {/* 편집 도구 */}
       {activeObject && (
         <div className="space-y-3">
@@ -84,7 +103,6 @@ export const Sidebar = ({ initialIsMobile }: SidebarProps) => {
           <div className="space-y-4">
             <TextControls />
             <ImageControls />
-            <BackgroundControls />
             <LayerControls />
           </div>
         </div>
@@ -112,7 +130,9 @@ export const Sidebar = ({ initialIsMobile }: SidebarProps) => {
 
       {isMobile ? (
         <BottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)}>
-          <SidebarContent />
+          <div className="p-4">
+            <SidebarContent />
+          </div>
         </BottomSheet>
       ) : (
         <aside className="w-80 bg-white border-l border-gray-200 overflow-y-auto">
