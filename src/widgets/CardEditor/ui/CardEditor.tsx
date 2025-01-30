@@ -65,10 +65,10 @@ export const CardEditor = () => {
     // 캔버스 클릭 이벤트 처리
     canvas.on("mouse:down", (options) => {
       const pointer = canvas.getPointer(options.e);
-      const clickedOutside = 
-        pointer.x < 0 || 
-        pointer.x > CANVAS_WIDTH || 
-        pointer.y < 0 || 
+      const clickedOutside =
+        pointer.x < 0 ||
+        pointer.x > CANVAS_WIDTH ||
+        pointer.y < 0 ||
         pointer.y > CANVAS_HEIGHT;
 
       if (clickedOutside) {
@@ -120,7 +120,7 @@ export const CardEditor = () => {
       }
     };
 
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = async (e: KeyboardEvent) => {
       if (!canvas) return;
 
       const activeObject = canvas.getActiveObject();
@@ -133,26 +133,26 @@ export const CardEditor = () => {
 
       // 화살표 키로 위치 미세 조정 (Shift 키와 함께 누르면 10픽셀씩 이동)
       const MOVE_STEP = e.shiftKey ? 10 : 1;
-      
+
       switch (e.key) {
         case "ArrowLeft":
           e.preventDefault();
-          activeObject.set('left', activeObject.left! - MOVE_STEP);
+          activeObject.set("left", activeObject.left! - MOVE_STEP);
           canvas.renderAll();
           break;
         case "ArrowRight":
           e.preventDefault();
-          activeObject.set('left', activeObject.left! + MOVE_STEP);
+          activeObject.set("left", activeObject.left! + MOVE_STEP);
           canvas.renderAll();
           break;
         case "ArrowUp":
           e.preventDefault();
-          activeObject.set('top', activeObject.top! - MOVE_STEP);
+          activeObject.set("top", activeObject.top! - MOVE_STEP);
           canvas.renderAll();
           break;
         case "ArrowDown":
           e.preventDefault();
-          activeObject.set('top', activeObject.top! + MOVE_STEP);
+          activeObject.set("top", activeObject.top! + MOVE_STEP);
           canvas.renderAll();
           break;
       }
@@ -166,26 +166,24 @@ export const CardEditor = () => {
 
       // Copy
       if ((e.ctrlKey || e.metaKey) && e.key === "c") {
-        activeObject.clone((cloned: any) => {
-          canvas.clipboard = cloned;
-        });
+        const cloned = await activeObject.clone();
+        canvas.clipboard = cloned;
       }
 
       // Paste
       if ((e.ctrlKey || e.metaKey) && e.key === "v") {
         if (!canvas.clipboard) return;
 
-        canvas.clipboard.clone((cloned: any) => {
-          canvas.discardActiveObject();
-          cloned.set({
-            left: cloned.left + 10,
-            top: cloned.top + 10,
-            evented: true,
-          });
-          canvas.add(cloned);
-          canvas.setActiveObject(cloned);
-          canvas.renderAll();
+        const cloned = await canvas.clipboard.clone();
+        canvas.discardActiveObject();
+        cloned.set({
+          left: cloned.left + 10,
+          top: cloned.top + 10,
+          evented: true,
         });
+        canvas.add(cloned);
+        canvas.setActiveObject(cloned);
+        canvas.renderAll();
       }
     };
 
@@ -246,38 +244,36 @@ export const CardEditor = () => {
     }
   };
 
-  const handleCopy = () => {
+  const handleCopy = async () => {
     if (!fabricRef.current) return;
 
     const activeObject = fabricRef.current.getActiveObject();
     if (activeObject) {
-      activeObject.clone((cloned: any) => {
-        fabricRef.current!.clipboard = cloned;
-      });
+      const cloned = await activeObject.clone();
+      fabricRef.current!.clipboard = cloned;
       setContextMenu({ x: 0, y: 0, visible: false });
     }
   };
 
-  const handlePaste = () => {
+  const handlePaste = async () => {
     if (!fabricRef.current || !fabricRef.current.clipboard) return;
 
-    fabricRef.current.clipboard.clone((cloned: any) => {
-      fabricRef.current!.discardActiveObject();
-      cloned.set({
-        left: cloned.left + 10,
-        top: cloned.top + 10,
-        evented: true,
-      });
-      fabricRef.current!.add(cloned);
-      fabricRef.current!.setActiveObject(cloned);
-      fabricRef.current!.renderAll();
-      setContextMenu({ x: 0, y: 0, visible: false });
+    const cloned = await fabricRef.current!.clipboard.clone();
+    fabricRef.current!.discardActiveObject();
+    cloned.set({
+      left: cloned.left + 10,
+      top: cloned.top + 10,
+      evented: true,
     });
+    fabricRef.current!.add(cloned);
+    fabricRef.current!.setActiveObject(cloned);
+    fabricRef.current!.renderAll();
+    setContextMenu({ x: 0, y: 0, visible: false });
   };
 
   return (
-    <div 
-      ref={wrapperRef} 
+    <div
+      ref={wrapperRef}
       className="w-full h-full overflow-auto bg-gray-100 relative"
       tabIndex={0}
     >

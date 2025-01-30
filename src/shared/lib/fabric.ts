@@ -40,11 +40,11 @@ export class IText extends FabricIText {
     });
 
     // 편집 모드 이벤트 처리
-    this.on('editing:entered', () => {
+    this.on("editing:entered", () => {
       this.isEditing = true;
     });
 
-    this.on('editing:exited', () => {
+    this.on("editing:exited", () => {
       this.isEditing = false;
     });
   }
