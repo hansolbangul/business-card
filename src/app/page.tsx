@@ -8,7 +8,7 @@ export default async function Home() {
   return (
     <div className="flex flex-col md:flex-row flex-1 h-[calc(100vh-4rem)]">
       <div className="flex-1 relative">
-        <CardEditor />
+        <CardEditor initialIsMobile={isMobile} />
       </div>
       <Sidebar initialIsMobile={isMobile} />
     </div>
