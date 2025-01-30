@@ -285,53 +285,47 @@ export const CardEditor = () => {
   };
 
   return (
-    <div
-      ref={wrapperRef}
-      className="w-full h-full overflow-auto bg-gray-100 relative"
-      tabIndex={0}
-    >
-      <div className="min-h-full p-8 flex items-center justify-center">
-        <div
-          className="border border-gray-200 rounded shadow-lg bg-white"
-          style={{
-            transform: `scale(${zoom})`,
-            transformOrigin: "center center",
-          }}
-        >
-          <canvas ref={canvasRef} className="max-w-full h-auto" />
-        </div>
+    <div className="relative flex-1 overflow-auto">
+      <div
+        ref={wrapperRef}
+        className="relative w-[90vw] lg:w-[900px] h-[500px] mx-auto my-8"
+      >
+        <canvas
+          ref={canvasRef}
+          className="w-full h-full border border-gray-200 rounded-lg"
+        />
+        <AnimatePresence>
+          {contextMenu.visible && (
+            <ContextMenu
+              x={contextMenu.x}
+              y={contextMenu.y}
+              onClose={() => setContextMenu({ x: 0, y: 0, visible: false })}
+            >
+              <button
+                onClick={handleCopy}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+              >
+                <span className="material-icons text-sm">content_copy</span>
+                복사
+              </button>
+              <button
+                onClick={handlePaste}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+              >
+                <span className="material-icons text-sm">content_paste</span>
+                붙여넣기
+              </button>
+              <button
+                onClick={handleDelete}
+                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+              >
+                <span className="material-icons text-sm">delete</span>
+                삭제
+              </button>
+            </ContextMenu>
+          )}
+        </AnimatePresence>
       </div>
-      <AnimatePresence>
-        {contextMenu.visible && (
-          <ContextMenu
-            x={contextMenu.x}
-            y={contextMenu.y}
-            onClose={() => setContextMenu({ x: 0, y: 0, visible: false })}
-          >
-            <button
-              onClick={handleCopy}
-              className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
-            >
-              <span className="material-icons text-sm">content_copy</span>
-              복사
-            </button>
-            <button
-              onClick={handlePaste}
-              className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
-            >
-              <span className="material-icons text-sm">content_paste</span>
-              붙여넣기
-            </button>
-            <button
-              onClick={handleDelete}
-              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-            >
-              <span className="material-icons text-sm">delete</span>
-              삭제
-            </button>
-          </ContextMenu>
-        )}
-      </AnimatePresence>
     </div>
   );
 };

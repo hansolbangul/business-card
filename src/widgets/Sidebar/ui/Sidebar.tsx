@@ -12,7 +12,6 @@ import { AddImage } from "@/features/elements/ui/AddImage";
 import { AddSocialIcon } from "@/features/elements/ui/AddSocialIcon";
 import { BackgroundControls } from "@/features/elements/ui/BackgroundControls";
 import { ImageControls } from "@/features/elements/ui/ImageControls";
-import { IText, FabricImage } from "@/shared/lib/fabric";
 
 export const Sidebar = () => {
   const openModal = (type: string) => {
@@ -34,57 +33,65 @@ export const Sidebar = () => {
   };
 
   return (
-    <aside className="w-64 fixed z-10 left-0 top-16 bottom-0 bg-white shadow-lg border-r border-gray-200 overflow-y-auto">
-      <div className="p-6 space-y-6">
+    <aside
+      className={`
+      w-full lg:w-64 bg-white shadow-lg border-gray-200 overflow-y-auto
+      lg:fixed lg:z-10 lg:left-0 lg:top-16 lg:bottom-0 lg:border-r
+      border-t lg:border-t-0
+    `}
+    >
+      <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
         {/* 기본 도구 */}
-        <div className="space-y-4">
+        <div className="space-y-2 lg:space-y-4">
           <h2 className="text-lg font-semibold text-black">기본 도구</h2>
-          <div className="space-y-4">
+          <div className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
             <AddText />
             <AddImage />
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => openModal("emoji")}
-                className="p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-900 flex flex-col items-center gap-2"
-              >
-                <span className="material-icons text-2xl">emoji_emotions</span>
-                <span className="text-sm">이모지</span>
-              </button>
-              <button
-                onClick={() => openModal("asset")}
-                className="p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-900 flex flex-col items-center gap-2"
-              >
-                <span className="material-icons text-2xl">category</span>
-                <span className="text-sm">에셋</span>
-              </button>
-              <button
-                onClick={() => openModal("social")}
-                className="p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-900 flex flex-col items-center gap-2"
-              >
-                <span className="material-icons text-2xl">share</span>
-                <span className="text-sm">SNS</span>
-              </button>
-            </div>
+          </div>
+          <div className="grid gap-3 grid-cols-2">
+            <button
+              onClick={() => openModal("emoji")}
+              className="flex-shrink-0 p-3 lg:p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-900 flex flex-col items-center gap-2"
+            >
+              <span className="material-icons text-xl lg:text-2xl">
+                emoji_emotions
+              </span>
+              <span className="text-xs lg:text-sm">이모지</span>
+            </button>
+            <button
+              onClick={() => openModal("asset")}
+              className="flex-shrink-0 p-3 lg:p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-900 flex flex-col items-center gap-2"
+            >
+              <span className="material-icons text-xl lg:text-2xl">
+                category
+              </span>
+              <span className="text-xs lg:text-sm">에셋</span>
+            </button>
+            <button
+              onClick={() => openModal("social")}
+              className="flex-shrink-0 p-3 lg:p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-900 flex flex-col items-center gap-2"
+            >
+              <span className="material-icons text-xl lg:text-2xl">share</span>
+              <span className="text-xs lg:text-sm">소셜</span>
+            </button>
           </div>
         </div>
 
-        {/* 요소 컨트롤 */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-black">요소 컨트롤</h2>
-          <div className="space-y-4">
+        {/* 편집 도구 */}
+        <div className="space-y-2 lg:space-y-4">
+          <h2 className="text-lg font-semibold text-black">편집 도구</h2>
+          <div className="space-y-3">
             <TextControls />
             <ImageControls />
-            <LayerControls />
             <BackgroundControls />
+            <LayerControls />
           </div>
         </div>
 
         {/* 내보내기 */}
-        <div className="space-y-4">
+        <div className="space-y-2 lg:space-y-4">
           <h2 className="text-lg font-semibold text-black">내보내기</h2>
-          <div className="space-y-4">
-            <DownloadCard />
-          </div>
+          <DownloadCard />
         </div>
       </div>
     </aside>

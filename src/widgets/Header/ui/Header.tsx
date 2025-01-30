@@ -10,7 +10,7 @@ export const Header = () => {
           href="/"
           className="text-xl font-bold text-blue-600 hover:text-blue-700 transition-colors"
         >
-          Business Card Maker
+          Business Card
         </Link>
       </div>
     </header>
