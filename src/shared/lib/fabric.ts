@@ -1,1 +1,42 @@
-export { Canvas, Image, IText } from "fabric";
+import {
+  Canvas as FabricCanvas,
+  IText as FabricIText,
+  loadSVGFromString,
+  FabricImage,
+  util,
+  FabricObject,
+} from "fabric";
+
+export class Canvas extends FabricCanvas {
+  clipboard: any;
+
+  constructor(element: HTMLCanvasElement, options?: any) {
+    super(element, options);
+    this.clipboard = null;
+  }
+}
+
+export class IText extends FabricIText {
+  constructor(text: string, options?: any) {
+    super(text, {
+      ...options,
+      editable: true,
+      fontFamily: "Arial",
+    });
+
+    // 텍스트 선택 시 기본 컨트롤 숨기기
+    this.setControlsVisibility({
+      mt: false,
+      mb: false,
+      ml: false,
+      mr: false,
+      bl: true,
+      br: true,
+      tl: true,
+      tr: true,
+      mtr: true,
+    });
+  }
+}
+
+export { FabricImage, loadSVGFromString, util, FabricObject };

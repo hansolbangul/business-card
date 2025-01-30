@@ -1,32 +1,40 @@
-'use client';
+"use client";
 
-import { useCanvasStore } from '@/entities/canvas/model/store';
-import { IText } from '@/shared/lib/fabric';
+import { useCanvasStore } from "@/entities/canvas/model/store";
+import { IText } from "@/shared/lib/fabric";
+
+let textCount = 1;
 
 export const AddText = () => {
-  const { canvas } = useCanvasStore();
+  const { canvas, setActiveObject } = useCanvasStore();
 
   const handleAddText = () => {
     if (!canvas) return;
 
-    const text = new IText('텍스트를 입력하세요', {
-      left: 10,
-      top: 10,
-      fontSize: 12,
-      fill: '#000000',
+    const text = new IText(`텍스트 ${textCount}`, {
+      left: 50 + textCount * 10,
+      top: 50 + textCount * 10,
+      fontSize: 20,
+      fill: "#000000",
+      fontFamily: "Arial",
     });
+
+    textCount++;
 
     canvas.add(text);
     canvas.setActiveObject(text);
+    setActiveObject(text);
+    text.enterEditing();
+    text.selectAll();
     canvas.renderAll();
   };
 
   return (
     <button
       onClick={handleAddText}
-      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors flex items-center gap-2"
+      className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
     >
-      <span className="material-icons text-gray-500">text_fields</span>
+      <span className="material-icons">text_fields</span>
       텍스트 추가
     </button>
   );

@@ -1,11 +1,11 @@
-import { create } from 'zustand';
-import { fabric } from 'fabric';
+import { create } from "zustand";
+import { Canvas, FabricObject } from "@/shared/lib/fabric";
 
 interface CanvasState {
-  canvas: fabric.Canvas | null;
-  setCanvas: (canvas: fabric.Canvas) => void;
-  activeObject: fabric.Object | null;
-  setActiveObject: (object: fabric.Object | null) => void;
+  canvas: Canvas | null;
+  setCanvas: (canvas: Canvas) => void;
+  activeObject: FabricObject | null;
+  setActiveObject: (object: FabricObject | null) => void;
 }
 
 export const useCanvasStore = create<CanvasState>((set) => ({
