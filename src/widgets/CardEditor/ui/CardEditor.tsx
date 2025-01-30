@@ -24,129 +24,76 @@ export const CardEditor = () => {
     y: 0,
     visible: false,
   });
+  const [canvasSize, setCanvasSize] = useState({
+    width: CANVAS_WIDTH,
+    height: CANVAS_HEIGHT,
+  });
 
   useEffect(() => {
     if (!canvasRef.current || !wrapperRef.current) return;
 
+    const updateCanvasSize = () => {
+      const isMobile = window.innerWidth < 768;
+      const width = isMobile ? window.innerWidth - 32 : CANVAS_WIDTH;
+      const height = isMobile
+        ? width * (CANVAS_HEIGHT / CANVAS_WIDTH)
+        : CANVAS_HEIGHT;
+
+      setCanvasSize({ width, height });
+
+      if (fabricRef.current) {
+        fabricRef.current.setDimensions({ width, height });
+        fabricRef.current.renderAll();
+      }
+    };
+
+    // 초기 캔버스 크기 설정
+    updateCanvasSize();
+
+    // Canvas 초기화
     const canvas = new Canvas(canvasRef.current, {
-      width: CANVAS_WIDTH,
-      height: CANVAS_HEIGHT,
+      width: canvasSize.width,
+      height: canvasSize.height,
       backgroundColor: "#ffffff",
-      selection: true,
+      selection: window.innerWidth >= 768,
+      preserveObjectStacking: true,
     });
 
     fabricRef.current = canvas;
     setCanvas(canvas);
 
-    const handleObjectModified = () => {
-      if (!fabricRef.current) return;
-
-      const activeObject = fabricRef.current.getActiveObject();
-      if (!activeObject) return;
-
-      // 모바일에서 삭제 버튼 표시
-      if (activeObject && window.innerWidth < 1024) {
-        const bound = activeObject.getBoundingRect();
-        const deleteBtn = document.createElement("button");
-        deleteBtn.className =
-          "absolute bg-white w-6 h-6 rounded-full shadow-md flex items-center justify-center cursor-pointer hover:bg-red-50 z-10";
-        deleteBtn.style.left = `${bound.left + bound.width / 2 - 12}px`;
-        deleteBtn.style.top = `${bound.top + bound.height + 8}px`;
-        deleteBtn.innerHTML =
-          '<span class="material-icons text-red-500 text-base leading-none">close</span>';
-        deleteBtn.onclick = () => {
-          fabricRef.current?.remove(activeObject);
-          fabricRef.current?.renderAll();
-          deleteBtn.remove();
-        };
-
-        wrapperRef.current?.appendChild(deleteBtn);
-
-        // 객체가 이동하면 버튼도 함께 이동
-        activeObject.on("moving", () => {
-          const newBound = activeObject.getBoundingRect();
-          deleteBtn.style.left = `${newBound.left + newBound.width / 2 - 12}px`;
-          deleteBtn.style.top = `${newBound.top + newBound.height + 8}px`;
-        });
-
-        // 객체가 리사이징될 때도 버튼 위치 업데이트
-        activeObject.on("scaling", () => {
-          const newBound = activeObject.getBoundingRect();
-          deleteBtn.style.left = `${newBound.left + newBound.width / 2 - 12}px`;
-          deleteBtn.style.top = `${newBound.top + newBound.height + 8}px`;
-        });
-
-        // 객체 선택이 해제되면 버튼 제거
-        activeObject.on("deselected", () => {
-          deleteBtn.remove();
-        });
-      }
-
-      setActiveObject(activeObject);
-    };
-
-    // 캔버스 영역 밖 클릭 감지를 위한 이벤트 리스너
-    const handleGlobalClick = (e: MouseEvent) => {
-      if (!canvasRef.current) return;
-
-      // 사이드바나 헤더 영역 클릭 시 무시
-      const target = e.target as HTMLElement;
-      if (
-        target.closest('[data-element="sidebar"]') ||
-        target.closest('[data-element="header"]') ||
-        target.closest('[role="dialog"]')
-      ) {
-        return;
-      }
-
-      const rect = canvasRef.current.getBoundingClientRect();
-      const clickedX = e.clientX - rect.left;
-      const clickedY = e.clientY - rect.top;
-
-      // 캔버스 영역 밖을 클릭했는지 확인
-      if (
-        clickedX < 0 ||
-        clickedX > CANVAS_WIDTH ||
-        clickedY < 0 ||
-        clickedY > CANVAS_HEIGHT
-      ) {
-        canvas.discardActiveObject();
-        setActiveObject(null);
-        canvas.renderAll();
-      }
-    };
-
-    // 전역 클릭 이벤트 리스너 등록
-    document.addEventListener("mousedown", handleGlobalClick);
-
-    // 캔버스 클릭 이벤트 처리
-    canvas.on("mouse:down", (options) => {
-      const pointer = canvas.getPointer(options.e);
-      const clickedOutside =
-        pointer.x < 0 ||
-        pointer.x > CANVAS_WIDTH ||
-        pointer.y < 0 ||
-        pointer.y > CANVAS_HEIGHT;
-
-      if (clickedOutside) {
-        canvas.discardActiveObject();
-        canvas.requestRenderAll();
+    // 객체 선택 이벤트
+    canvas.on("selection:created", (options) => {
+      const selectedObject = options.selected?.[0];
+      if (selectedObject) {
+        setActiveObject(selectedObject);
       }
     });
 
-    // 선택된 객체 처리
-    canvas.on("selection:created", () => {
-      handleObjectModified();
-    });
-
-    canvas.on("selection:updated", () => {
-      handleObjectModified();
+    canvas.on("selection:updated", (options) => {
+      const selectedObject = options.selected?.[0];
+      if (selectedObject) {
+        setActiveObject(selectedObject);
+      }
     });
 
     canvas.on("selection:cleared", () => {
       setActiveObject(null);
     });
 
+    // 모바일에서 드래그 제한
+    canvas.on("mouse:down", (e) => {
+      if (window.innerWidth < 768) {
+        const target = e.target;
+        if (target) {
+          target.selectable = true;
+          canvas.setActiveObject(target);
+        }
+        canvas.selection = false;
+      }
+    });
+
+    // 객체가 캔버스 밖으로 나가지 않도록 제한
     canvas.on("object:moving", (e) => {
       const obj = e.target;
       if (!obj) return;
@@ -158,25 +105,15 @@ export const CardEditor = () => {
       if (bound.top < 0) {
         obj.top = 0;
       }
-      if (bound.left + bound.width > canvas.width!) {
-        obj.left = canvas.width! - bound.width;
+      if (bound.left + bound.width > canvasSize.width) {
+        obj.left = canvasSize.width - bound.width;
       }
-      if (bound.top + bound.height > canvas.height!) {
-        obj.top = canvas.height! - bound.height;
+      if (bound.top + bound.height > canvasSize.height) {
+        obj.top = canvasSize.height - bound.height;
       }
     });
 
-    const handleWheel = (e: WheelEvent) => {
-      if (e.ctrlKey || e.metaKey) {
-        e.preventDefault();
-        const delta = e.deltaY;
-        setZoom((prev) => {
-          const newZoom = prev + (delta > 0 ? -0.1 : 0.1);
-          return Math.min(Math.max(0.1, newZoom), 3);
-        });
-      }
-    };
-
+    // 키보드 이벤트 처리
     const handleKeyDown = async (e: KeyboardEvent) => {
       if (!canvas) return;
 
@@ -195,7 +132,6 @@ export const CardEditor = () => {
         if (activeObject.type === "activeselection") {
           // 다중 선택된 객체들을 모두 삭제
           const activeSelection = activeObject as ActiveSelection;
-
           const objects = [...activeSelection.getObjects()];
           activeSelection.removeAll();
           objects.forEach((obj) => canvas.remove(obj));
@@ -208,7 +144,7 @@ export const CardEditor = () => {
         return;
       }
 
-      // 화살표 키로 위치 미세 조정 (Shift 키와 함께 누르면 10픽셀씩 이동)
+      // 화살표 키로 위치 미세 조정
       const MOVE_STEP = e.shiftKey ? 10 : 1;
 
       switch (e.key) {
@@ -234,13 +170,12 @@ export const CardEditor = () => {
           break;
       }
 
-      // Copy
+      // Copy & Paste
       if ((e.ctrlKey || e.metaKey) && e.key === "c") {
         const cloned = await activeObject.clone();
         canvas.clipboard = cloned;
       }
 
-      // Paste
       if ((e.ctrlKey || e.metaKey) && e.key === "v") {
         if (!canvas.clipboard) return;
 
@@ -257,6 +192,7 @@ export const CardEditor = () => {
       }
     };
 
+    // 우클릭 메뉴
     const handleContextMenu = (e: MouseEvent) => {
       e.preventDefault();
       const target = canvas.findTarget(e);
@@ -275,25 +211,24 @@ export const CardEditor = () => {
     };
 
     // 이벤트 리스너 등록
-    canvasRef.current.addEventListener("wheel", handleWheel, {
-      passive: false,
-    });
     wrapperRef.current.addEventListener("keydown", handleKeyDown);
-    wrapperRef.current.tabIndex = 0; // 키보드 이벤트를 받을 수 있도록 설정
+    wrapperRef.current.tabIndex = 0;
     canvasRef.current.addEventListener("contextmenu", handleContextMenu);
+
+    // 리사이즈 이벤트
+    window.addEventListener("resize", updateCanvasSize);
 
     return () => {
       canvas.dispose();
-      document.removeEventListener("mousedown", handleGlobalClick);
+      window.removeEventListener("resize", updateCanvasSize);
       if (canvasRef.current) {
-        canvasRef.current.removeEventListener("wheel", handleWheel);
         canvasRef.current.removeEventListener("contextmenu", handleContextMenu);
       }
       if (wrapperRef.current) {
         wrapperRef.current.removeEventListener("keydown", handleKeyDown);
       }
     };
-  }, [setCanvas, setActiveObject]);
+  }, []);
 
   useEffect(() => {
     if (fabricRef.current) {
@@ -341,47 +276,48 @@ export const CardEditor = () => {
   };
 
   return (
-    <div className="relative flex-1 overflow-auto">
+    <div className="w-full h-full flex items-center justify-center bg-gray-50">
       <div
         ref={wrapperRef}
-        className="relative w-[90vw] lg:w-[900px] h-[500px] mx-auto my-8"
+        className="relative bg-white rounded-lg shadow-lg overflow-hidden"
+        style={{
+          width: canvasSize.width,
+          height: canvasSize.height,
+        }}
       >
-        <canvas
-          ref={canvasRef}
-          className="w-full h-full border border-gray-200 rounded-lg"
-        />
-        <AnimatePresence>
-          {contextMenu.visible && (
-            <ContextMenu
-              x={contextMenu.x}
-              y={contextMenu.y}
-              onClose={() => setContextMenu({ x: 0, y: 0, visible: false })}
-            >
-              <button
-                onClick={handleCopy}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
-              >
-                <span className="material-icons text-sm">content_copy</span>
-                복사
-              </button>
-              <button
-                onClick={handlePaste}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
-              >
-                <span className="material-icons text-sm">content_paste</span>
-                붙여넣기
-              </button>
-              <button
-                onClick={handleDelete}
-                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-              >
-                <span className="material-icons text-sm">delete</span>
-                삭제
-              </button>
-            </ContextMenu>
-          )}
-        </AnimatePresence>
+        <canvas ref={canvasRef} />
       </div>
+      <AnimatePresence>
+        {contextMenu.visible && (
+          <ContextMenu
+            x={contextMenu.x}
+            y={contextMenu.y}
+            onClose={() => setContextMenu({ x: 0, y: 0, visible: false })}
+          >
+            <button
+              onClick={handleCopy}
+              className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+            >
+              <span className="material-icons text-sm">content_copy</span>
+              복사
+            </button>
+            <button
+              onClick={handlePaste}
+              className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+            >
+              <span className="material-icons text-sm">content_paste</span>
+              붙여넣기
+            </button>
+            <button
+              onClick={handleDelete}
+              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+            >
+              <span className="material-icons text-sm">delete</span>
+              삭제
+            </button>
+          </ContextMenu>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

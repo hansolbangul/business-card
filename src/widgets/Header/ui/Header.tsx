@@ -68,7 +68,7 @@ export const Header = () => {
   return (
     <header
       data-element="header"
-      className="fixed top-0 left-0 right-0 bg-white shadow-lg z-40 border-b border-gray-200"
+      className="fixed top-0 left-0 right-0 bg-white shadow-lg z-[46] border-b border-gray-200"
     >
       <div className="max-w-[1920px] mx-auto px-4 h-16 flex items-center justify-between">
         <Link

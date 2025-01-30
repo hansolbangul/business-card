@@ -1,24 +1,17 @@
 import { CardEditor } from "@/widgets/CardEditor/ui/CardEditor";
 import { Header } from "@/widgets/Header/ui/Header";
 import { Sidebar } from "@/widgets/Sidebar/ui/Sidebar";
+import { getDeviceType } from "@/shared/lib/device/getDeviceType";
 
-export default function Home() {
+export default async function Home() {
+  const { isMobile } = await getDeviceType();
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      <div className="flex flex-col lg:flex-row">
-        <div className="hidden lg:block">
-          <Sidebar />
-        </div>
-        <main className="flex-1 lg:ml-64 pt-16">
-          <div className="w-full min-h-[calc(100vh-4rem)] bg-gray-50">
-            <CardEditor />
-            <div className="lg:hidden">
-              <Sidebar />
-            </div>
-          </div>
-        </main>
+    <div className="flex flex-col md:flex-row flex-1 h-[calc(100vh-4rem)]">
+      <div className="flex-1 relative">
+        <CardEditor />
       </div>
+      <Sidebar initialIsMobile={isMobile} />
     </div>
   );
 }
