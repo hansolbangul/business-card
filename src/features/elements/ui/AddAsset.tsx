@@ -7,7 +7,11 @@ import Image from "next/image";
 const BASIC_ASSETS = [
   {
     name: "chill guy 밈",
-    assets: ["/assets/chill-guy.webp", "/assets/chill-background.jpg"],
+    assets: [
+      "/assets/chill-guy.webp",
+      "/assets/chill-background1.jpg",
+      "/assets/chill-background2.jpg",
+    ],
   },
   // {
   //   name: "아이콘",
