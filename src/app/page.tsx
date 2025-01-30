@@ -1,5 +1,4 @@
 import { CardEditor } from "@/widgets/CardEditor/ui/CardEditor";
-import { Header } from "@/widgets/Header/ui/Header";
 import { Sidebar } from "@/widgets/Sidebar/ui/Sidebar";
 import { getDeviceType } from "@/shared/lib/device/getDeviceType";
 
