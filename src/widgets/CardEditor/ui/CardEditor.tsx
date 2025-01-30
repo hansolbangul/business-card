@@ -8,6 +8,7 @@ import { AnimatePresence } from "framer-motion";
 
 export const CardEditor = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const fabricRef = useRef<Canvas | null>(null);
   const { setCanvas, setActiveObject } = useCanvasStore();
   const [zoom, setZoom] = useState(1);
@@ -22,7 +23,7 @@ export const CardEditor = () => {
   });
 
   useEffect(() => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current || !wrapperRef.current) return;
 
     const canvas = new Canvas(canvasRef.current, {
       width: 900,
@@ -92,6 +93,32 @@ export const CardEditor = () => {
         return;
       }
 
+      // 화살표 키로 위치 미세 조정 (Shift 키와 함께 누르면 10픽셀씩 이동)
+      const MOVE_STEP = e.shiftKey ? 10 : 1;
+      
+      switch (e.key) {
+        case "ArrowLeft":
+          e.preventDefault();
+          activeObject.set('left', activeObject.left! - MOVE_STEP);
+          canvas.renderAll();
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          activeObject.set('left', activeObject.left! + MOVE_STEP);
+          canvas.renderAll();
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          activeObject.set('top', activeObject.top! - MOVE_STEP);
+          canvas.renderAll();
+          break;
+        case "ArrowDown":
+          e.preventDefault();
+          activeObject.set('top', activeObject.top! + MOVE_STEP);
+          canvas.renderAll();
+          break;
+      }
+
       // Delete
       if (e.key === "Delete" || e.key === "Backspace") {
         canvas.remove(activeObject);
@@ -142,10 +169,12 @@ export const CardEditor = () => {
       }
     };
 
+    // 이벤트 리스너 등록
     canvasRef.current.addEventListener("wheel", handleWheel, {
       passive: false,
     });
-    window.addEventListener("keydown", handleKeyDown);
+    wrapperRef.current.addEventListener("keydown", handleKeyDown);
+    wrapperRef.current.tabIndex = 0; // 키보드 이벤트를 받을 수 있도록 설정
     canvasRef.current.addEventListener("contextmenu", handleContextMenu);
 
     return () => {
@@ -154,7 +183,9 @@ export const CardEditor = () => {
         canvasRef.current.removeEventListener("wheel", handleWheel);
         canvasRef.current.removeEventListener("contextmenu", handleContextMenu);
       }
-      window.removeEventListener("keydown", handleKeyDown);
+      if (wrapperRef.current) {
+        wrapperRef.current.removeEventListener("keydown", handleKeyDown);
+      }
     };
   }, [setCanvas, setActiveObject]);
 
@@ -191,28 +222,26 @@ export const CardEditor = () => {
   const handlePaste = () => {
     if (!fabricRef.current || !fabricRef.current.clipboard) return;
 
-    fabricRef.current.clipboard.clone((clonedObj: any) => {
+    fabricRef.current.clipboard.clone((cloned: any) => {
       fabricRef.current!.discardActiveObject();
-      clonedObj.set({
-        left: clonedObj.left + 10,
-        top: clonedObj.top + 10,
+      cloned.set({
+        left: cloned.left + 10,
+        top: cloned.top + 10,
         evented: true,
       });
-      if (clonedObj.type === "activeSelection") {
-        clonedObj.canvas = fabricRef.current;
-        clonedObj.forEachObject((obj: any) => fabricRef.current!.add(obj));
-        clonedObj.setCoords();
-      } else {
-        fabricRef.current!.add(clonedObj);
-      }
-      fabricRef.current!.setActiveObject(clonedObj);
+      fabricRef.current!.add(cloned);
+      fabricRef.current!.setActiveObject(cloned);
       fabricRef.current!.renderAll();
+      setContextMenu({ x: 0, y: 0, visible: false });
     });
-    setContextMenu({ x: 0, y: 0, visible: false });
   };
 
   return (
-    <div className="w-full h-full overflow-auto bg-white relative">
+    <div 
+      ref={wrapperRef} 
+      className="w-full h-full overflow-auto bg-white relative"
+      tabIndex={0} // 키보드 이벤트를 받을 수 있도록 설정
+    >
       <div className="min-h-full p-8 flex items-center justify-center">
         <div
           className="border border-gray-200 rounded shadow-lg"
