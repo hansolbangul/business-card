@@ -17,6 +17,7 @@ export const Sidebar = () => {
     const components = {
       emoji: { component: AddEmoji, title: "이모지 추가" },
       asset: { component: AddAsset, title: "에셋 추가" },
+      social: { component: AddSocialIcon, title: "소셜 아이콘 추가" },
     };
 
     const selected = components[type as keyof typeof components];
@@ -25,7 +26,7 @@ export const Sidebar = () => {
     const Component = selected.component;
     modalControl.open((close) => (
       <ModalContent close={close} title={selected.title}>
-        <Component />
+        <Component close={close} />
       </ModalContent>
     ));
   };
@@ -54,34 +55,32 @@ export const Sidebar = () => {
                 <span className="material-icons text-2xl">category</span>
                 <span className="text-sm">에셋</span>
               </button>
-              <AddSocialIcon />
+              <button
+                onClick={() => openModal("social")}
+                className="p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-900 flex flex-col items-center gap-2"
+              >
+                <span className="material-icons text-2xl">share</span>
+                <span className="text-sm">SNS</span>
+              </button>
             </div>
           </div>
         </div>
 
-        {/* 레이어 컨트롤 */}
-        <motion.div
-          initial={false}
-          animate={{ height: "auto" }}
-          className="space-y-4"
-        >
-          <h2 className="text-lg font-semibold text-black">레이어</h2>
-          <LayerControls />
-        </motion.div>
+        {/* 요소 컨트롤 */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-black">요소 컨트롤</h2>
+          <div className="space-y-4">
+            <TextControls />
+            <LayerControls />
+          </div>
+        </div>
 
-        {/* 텍스트 스타일 */}
-        <motion.div
-          initial={false}
-          animate={{ height: "auto" }}
-          className="space-y-4"
-        >
-          <h2 className="text-lg font-semibold text-black">텍스트 스타일</h2>
-          <TextControls />
-        </motion.div>
-
-        {/* 다운로드 */}
-        <div className="pt-4 border-t border-gray-200">
-          <DownloadCard />
+        {/* 내보내기 */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-black">내보내기</h2>
+          <div className="space-y-4">
+            <DownloadCard />
+          </div>
         </div>
       </div>
     </aside>

@@ -18,7 +18,11 @@ const EMOJI_CATEGORIES = [
   },
 ];
 
-export const AddEmoji = () => {
+interface AddEmojiProps {
+  close: () => void;
+}
+
+export const AddEmoji = ({ close }: AddEmojiProps) => {
   const { canvas } = useCanvasStore();
 
   const handleAddEmoji = (emoji: string) => {
@@ -33,6 +37,7 @@ export const AddEmoji = () => {
     canvas.add(text);
     canvas.setActiveObject(text);
     canvas.renderAll();
+    close();
   };
 
   return (

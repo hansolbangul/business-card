@@ -24,7 +24,11 @@ const BASIC_ASSETS = [
   },
 ];
 
-export const AddAsset = () => {
+interface AddAssetProps {
+  close: () => void;
+}
+
+export const AddAsset = ({ close }: AddAssetProps) => {
   const { canvas } = useCanvasStore();
 
   const handleAddAsset = async (assetUrl: string) => {
@@ -50,8 +54,9 @@ export const AddAsset = () => {
       canvas.add(fabricImage);
       canvas.setActiveObject(fabricImage);
       canvas.renderAll();
+      close();
     } catch (error) {
-      console.error('Error loading asset:', error);
+      console.error('Failed to load asset:', error);
     }
   };
 
