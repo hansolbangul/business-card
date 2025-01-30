@@ -5,9 +5,7 @@ import { Canvas, IText, ActiveSelection } from "@/shared/lib/fabric";
 import { useCanvasStore } from "@/entities/canvas/model/store";
 import { ContextMenu } from "@/shared/ui/ContextMenu";
 import { AnimatePresence } from "framer-motion";
-
-const CANVAS_WIDTH = 900;
-const CANVAS_HEIGHT = 500;
+import { CANVAS_SIZES } from "@/features/elements/model/canvas";
 
 export const CardEditor = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -24,9 +22,12 @@ export const CardEditor = () => {
     y: 0,
     visible: false,
   });
-  const [canvasSize, setCanvasSize] = useState({
-    width: CANVAS_WIDTH,
-    height: CANVAS_HEIGHT,
+  const [canvasSize, setCanvasSize] = useState<{
+    width: number;
+    height: number;
+  }>({
+    width: CANVAS_SIZES.BUSINESS_CARD.width,
+    height: CANVAS_SIZES.BUSINESS_CARD.height,
   });
 
   useEffect(() => {
@@ -34,10 +35,12 @@ export const CardEditor = () => {
 
     const updateCanvasSize = () => {
       const isMobile = window.innerWidth < 768;
-      const width = isMobile ? window.innerWidth - 32 : CANVAS_WIDTH;
+      const width = isMobile
+        ? CANVAS_SIZES.MOBILE.width
+        : CANVAS_SIZES.BUSINESS_CARD.width;
       const height = isMobile
-        ? width * (CANVAS_HEIGHT / CANVAS_WIDTH)
-        : CANVAS_HEIGHT;
+        ? CANVAS_SIZES.MOBILE.height
+        : CANVAS_SIZES.BUSINESS_CARD.height;
 
       setCanvasSize({ width, height });
 
