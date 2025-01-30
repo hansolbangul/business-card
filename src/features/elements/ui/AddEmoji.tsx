@@ -1,20 +1,24 @@
-'use client';
+"use client";
 
-import { useCanvasStore } from '@/entities/canvas/model/store';
-import { IText } from '@/shared/lib/fabric';
+import { useCanvasStore } from "@/entities/canvas/model/store";
+import { IText } from "@/shared/lib/fabric";
 
 const EMOJI_CATEGORIES = [
   {
-    name: '표정',
-    emojis: ['😀', '😊', '🥰', '😎', '🤔', '😅', '😂', '🥳'],
+    name: "개발",
+    emojis: ["🧑‍💻", "🧑🏻‍💻", "👩‍💻", "👩🏻‍💻"],
   },
   {
-    name: '사물',
-    emojis: ['💼', '📱', '💻', '📧', '📎', '📌', '🔍', '💡'],
+    name: "표정",
+    emojis: ["😀", "😊", "🥰", "😎", "🤔", "😅", "😂", "🥳"],
   },
   {
-    name: '기호',
-    emojis: ['✨', '💫', '⭐', '❤️', '✅', '☑️', '✔️', '➡️'],
+    name: "사물",
+    emojis: ["💼", "📱", "💻", "📧", "📎", "📌", "🔍", "💡"],
+  },
+  {
+    name: "기호",
+    emojis: ["✨", "💫", "⭐", "❤️", "✅", "☑️", "✔️", "➡️"],
   },
 ];
 
