@@ -38,9 +38,66 @@ export const CardEditor = () => {
     fabricRef.current = canvas;
     setCanvas(canvas);
 
+    const handleObjectModified = () => {
+      if (!fabricRef.current) return;
+
+      const activeObject = fabricRef.current.getActiveObject();
+      if (!activeObject) return;
+
+      // 모바일에서 삭제 버튼 표시
+      if (activeObject && window.innerWidth < 1024) {
+        const bound = activeObject.getBoundingRect();
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className =
+          "absolute bg-white w-6 h-6 rounded-full shadow-md flex items-center justify-center cursor-pointer hover:bg-red-50 z-10";
+        deleteBtn.style.left = `${bound.left + bound.width / 2 - 12}px`;
+        deleteBtn.style.top = `${bound.top + bound.height + 8}px`;
+        deleteBtn.innerHTML =
+          '<span class="material-icons text-red-500 text-base leading-none">close</span>';
+        deleteBtn.onclick = () => {
+          fabricRef.current?.remove(activeObject);
+          fabricRef.current?.renderAll();
+          deleteBtn.remove();
+        };
+
+        wrapperRef.current?.appendChild(deleteBtn);
+
+        // 객체가 이동하면 버튼도 함께 이동
+        activeObject.on("moving", () => {
+          const newBound = activeObject.getBoundingRect();
+          deleteBtn.style.left = `${newBound.left + newBound.width / 2 - 12}px`;
+          deleteBtn.style.top = `${newBound.top + newBound.height + 8}px`;
+        });
+
+        // 객체가 리사이징될 때도 버튼 위치 업데이트
+        activeObject.on("scaling", () => {
+          const newBound = activeObject.getBoundingRect();
+          deleteBtn.style.left = `${newBound.left + newBound.width / 2 - 12}px`;
+          deleteBtn.style.top = `${newBound.top + newBound.height + 8}px`;
+        });
+
+        // 객체 선택이 해제되면 버튼 제거
+        activeObject.on("deselected", () => {
+          deleteBtn.remove();
+        });
+      }
+
+      setActiveObject(activeObject);
+    };
+
     // 캔버스 영역 밖 클릭 감지를 위한 이벤트 리스너
     const handleGlobalClick = (e: MouseEvent) => {
       if (!canvasRef.current) return;
+
+      // 사이드바나 헤더 영역 클릭 시 무시
+      const target = e.target as HTMLElement;
+      if (
+        target.closest('[data-element="sidebar"]') ||
+        target.closest('[data-element="header"]') ||
+        target.closest('[role="dialog"]')
+      ) {
+        return;
+      }
 
       const rect = canvasRef.current.getBoundingClientRect();
       const clickedX = e.clientX - rect.left;
@@ -55,7 +112,7 @@ export const CardEditor = () => {
       ) {
         canvas.discardActiveObject();
         setActiveObject(null);
-        canvas.requestRenderAll();
+        canvas.renderAll();
       }
     };
 
@@ -79,11 +136,11 @@ export const CardEditor = () => {
 
     // 선택된 객체 처리
     canvas.on("selection:created", (e: any) => {
-      setActiveObject(e.selected[0]);
+      handleObjectModified();
     });
 
     canvas.on("selection:updated", (e: any) => {
-      setActiveObject(e.selected[0]);
+      handleObjectModified();
     });
 
     canvas.on("selection:cleared", () => {

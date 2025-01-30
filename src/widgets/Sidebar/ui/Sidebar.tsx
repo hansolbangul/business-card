@@ -12,6 +12,7 @@ import { AddImage } from "@/features/elements/ui/AddImage";
 import { AddSocialIcon } from "@/features/elements/ui/AddSocialIcon";
 import { BackgroundControls } from "@/features/elements/ui/BackgroundControls";
 import { ImageControls } from "@/features/elements/ui/ImageControls";
+import cn from 'classnames';
 
 export const Sidebar = () => {
   const openModal = (type: string) => {
@@ -34,11 +35,12 @@ export const Sidebar = () => {
 
   return (
     <aside
-      className={`
-      w-full lg:w-64 bg-white shadow-lg border-gray-200 overflow-y-auto
-      lg:fixed lg:z-10 lg:left-0 lg:top-16 lg:bottom-0 lg:border-r
-      border-t lg:border-t-0
-    `}
+      data-element="sidebar"
+      className={cn(
+        "w-full lg:w-64 bg-white shadow-lg border-gray-200 overflow-y-auto",
+        "lg:fixed lg:z-10 lg:left-0 lg:top-16 lg:bottom-0 lg:border-r",
+        "border-t lg:border-t-0"
+      )}
     >
       <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
         {/* 기본 도구 */}
