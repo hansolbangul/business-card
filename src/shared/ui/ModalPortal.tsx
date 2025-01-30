@@ -11,7 +11,6 @@ export const ModalPortal = () => {
   const [content, setContent] = useState<ModalContentFn | null>(null);
 
   useEffect(() => {
-    // Create portal element if it doesn't exist
     let element = document.getElementById("modal-portal");
     if (!element) {
       element = document.createElement("div");
@@ -20,10 +19,9 @@ export const ModalPortal = () => {
     }
     setPortalElement(element);
 
-    // Subscribe to modal events
     const unsubscribe = modalControl.subscribe((event) => {
       if (event.type === "OPEN_MODAL" && event.payload?.content) {
-        setContent(() => event.payload.content);
+        setContent(() => event.payload?.content ?? null);
       } else if (event.type === "CLOSE_MODAL") {
         setContent(null);
       }
