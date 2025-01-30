@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { AddText } from "@/features/elements/ui/AddText";
 import { DownloadCard } from "@/features/export/ui/DownloadCard";
 import { TextControls } from "@/features/elements/ui/TextControls";
