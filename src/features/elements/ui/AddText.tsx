@@ -3,10 +3,8 @@
 import { useCanvasStore } from "@/entities/canvas/model/store";
 import { IText } from "@/shared/lib/fabric";
 
-let textCount = 1;
-
 export const AddText = () => {
-  const { canvas, setActiveObject } = useCanvasStore();
+  const { canvas } = useCanvasStore();
 
   const handleAddText = () => {
     if (!canvas) return;

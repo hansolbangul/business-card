@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, ChangeEvent } from "react";
 import { useCanvasStore } from "@/entities/canvas/model/store";
 import { IText } from "@/shared/lib/fabric";
 
@@ -27,6 +27,17 @@ export const TextControls = () => {
     activeObject.dirty = true;
   };
 
+  const handleFontSizeChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const fontSize = parseInt(e.target.value);
+    if (!isNaN(fontSize)) {
+      updateTextStyle({ fontSize });
+    }
+  };
+
+  const handleColorChange = (e: ChangeEvent<HTMLInputElement>) => {
+    updateTextStyle({ fill: e.target.value });
+  };
+
   if (!activeObject || !(activeObject instanceof IText)) {
     return null;
   }
@@ -51,18 +62,40 @@ export const TextControls = () => {
         />
       </div>
 
+      {/* 글자 크기 */}
+      <div className="flex flex-col gap-2">
+        <label htmlFor="fontSize" className="text-sm font-medium text-gray-700">
+          글자 크기
+        </label>
+        <input
+          type="number"
+          id="fontSize"
+          min="1"
+          max="200"
+          value={activeObject.fontSize || 20}
+          onChange={handleFontSizeChange}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
       {/* 색상 선택 */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">색상</label>
+        <label
+          htmlFor="textColor"
+          className="text-sm font-medium text-gray-700"
+        >
+          글자 색상
+        </label>
         <div className="flex items-center gap-2">
           <input
             type="color"
-            value={activeObject.fill as string}
-            onChange={(e) => updateTextStyle({ fill: e.target.value })}
+            id="textColor"
+            value={activeObject.fill?.toString() || "#000000"}
+            onChange={handleColorChange}
             className="w-8 h-8 rounded border border-gray-200 p-0.5"
           />
           <span className="text-sm text-gray-600">
-            {activeObject.fill as string}
+            {activeObject.fill?.toString() || "#000000"}
           </span>
         </div>
       </div>

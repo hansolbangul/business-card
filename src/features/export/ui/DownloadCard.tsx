@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useCanvasStore } from '@/entities/canvas/model/store';
+import { useCanvasStore } from "@/entities/canvas/model/store";
 
 export const DownloadCard = () => {
   const { canvas } = useCanvasStore();
@@ -9,12 +9,13 @@ export const DownloadCard = () => {
     if (!canvas) return;
 
     const dataURL = canvas.toDataURL({
-      format: 'png',
+      format: "png",
       quality: 1,
+      multiplier: 2,
     });
 
-    const link = document.createElement('a');
-    link.download = 'business-card.png';
+    const link = document.createElement("a");
+    link.download = "business-card.png";
     link.href = dataURL;
     document.body.appendChild(link);
     link.click();

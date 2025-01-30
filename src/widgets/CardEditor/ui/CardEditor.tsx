@@ -135,11 +135,11 @@ export const CardEditor = () => {
     });
 
     // 선택된 객체 처리
-    canvas.on("selection:created", (e: any) => {
+    canvas.on("selection:created", () => {
       handleObjectModified();
     });
 
-    canvas.on("selection:updated", (e: any) => {
+    canvas.on("selection:updated", () => {
       handleObjectModified();
     });
 
@@ -259,7 +259,6 @@ export const CardEditor = () => {
 
     const handleContextMenu = (e: MouseEvent) => {
       e.preventDefault();
-      const pointer = canvas.getPointer(e);
       const target = canvas.findTarget(e);
 
       if (target) {

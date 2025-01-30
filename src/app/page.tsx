@@ -1,7 +1,6 @@
-import Image from "next/image";
-import { CardEditor } from '@/widgets/CardEditor';
-import { Header } from '@/widgets/Header/ui/Header';
-import { Sidebar } from '@/widgets/Sidebar/ui/Sidebar';
+import { CardEditor } from "@/widgets/CardEditor/ui/CardEditor";
+import { Header } from "@/widgets/Header/ui/Header";
+import { Sidebar } from "@/widgets/Sidebar/ui/Sidebar";
 
 export default function Home() {
   return (
