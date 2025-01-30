@@ -11,6 +11,7 @@ import { AddEmoji } from "@/features/elements/ui/AddEmoji";
 import { AddAsset } from "@/features/elements/ui/AddAsset";
 import { AddImage } from "@/features/elements/ui/AddImage";
 import { AddSocialIcon } from "@/features/elements/ui/AddSocialIcon";
+import { BackgroundControls } from "@/features/elements/ui/BackgroundControls";
 
 export const Sidebar = () => {
   const openModal = (type: string) => {
@@ -72,6 +73,7 @@ export const Sidebar = () => {
           <div className="space-y-4">
             <TextControls />
             <LayerControls />
+            <BackgroundControls />
           </div>
         </div>
 
