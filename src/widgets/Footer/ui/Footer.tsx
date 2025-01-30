@@ -4,7 +4,7 @@ import { FaHeart } from "react-icons/fa";
 
 export const Footer = () => {
   return (
-    <footer className="bg-white border-t border-gray-200 py-6 mt-auto z-50">
+    <footer className="bg-white border-t border-gray-200 py-6 mt-auto z-[41]">
       <div className="max-w-[1920px] mx-auto px-4">
         <div className="flex flex-col items-center space-y-4 text-center">
           <p className="text-gray-600 flex items-center gap-2">

@@ -55,31 +55,12 @@ export const CardEditor = () => {
       width: canvasSize.width,
       height: canvasSize.height,
       backgroundColor: "#ffffff",
-      selection: window.innerWidth >= 768,
+      selection: true,
       preserveObjectStacking: true,
     });
 
     fabricRef.current = canvas;
     setCanvas(canvas);
-
-    // 객체 선택 이벤트
-    canvas.on("selection:created", (options) => {
-      const selectedObject = options.selected?.[0];
-      if (selectedObject) {
-        setActiveObject(selectedObject);
-      }
-    });
-
-    canvas.on("selection:updated", (options) => {
-      const selectedObject = options.selected?.[0];
-      if (selectedObject) {
-        setActiveObject(selectedObject);
-      }
-    });
-
-    canvas.on("selection:cleared", () => {
-      setActiveObject(null);
-    });
 
     // 모바일에서 드래그 제한
     canvas.on("mouse:down", (e) => {
@@ -92,6 +73,72 @@ export const CardEditor = () => {
         canvas.selection = false;
       }
     });
+
+    canvas.on("selection:created", (options) => {
+      const selectedObject = options.selected?.[0];
+      if (selectedObject) {
+        setActiveObject(selectedObject);
+        if (window.innerWidth < 768) {
+          showMobileDeleteButton(selectedObject);
+        }
+      }
+    });
+
+    canvas.on("selection:updated", (options) => {
+      const selectedObject = options.selected?.[0];
+      if (selectedObject) {
+        setActiveObject(selectedObject);
+        if (window.innerWidth < 768) {
+          showMobileDeleteButton(selectedObject);
+        }
+      }
+    });
+
+    canvas.on("selection:cleared", () => {
+      setActiveObject(null);
+      removeMobileDeleteButton();
+    });
+
+    // 모바일 삭제 버튼 표시 함수
+    const showMobileDeleteButton = (selectedObject: any) => {
+      removeMobileDeleteButton();
+
+      const bound = selectedObject.getBoundingRect();
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className =
+        "mobile-delete-btn absolute bg-white w-6 h-6 rounded-full shadow-md flex items-center justify-center cursor-pointer hover:bg-red-50 z-10";
+      deleteBtn.style.left = `${bound.left + bound.width / 2 - 12}px`;
+      deleteBtn.style.top = `${bound.top - 24}px`;
+      deleteBtn.innerHTML =
+        '<span class="material-icons text-red-500 text-base leading-none">close</span>';
+      deleteBtn.onclick = () => {
+        canvas.remove(selectedObject);
+        canvas.renderAll();
+        deleteBtn.remove();
+      };
+
+      wrapperRef.current?.appendChild(deleteBtn);
+
+      selectedObject.on("moving", () => {
+        const newBound = selectedObject.getBoundingRect();
+        deleteBtn.style.left = `${newBound.left + newBound.width / 2 - 12}px`;
+        deleteBtn.style.top = `${newBound.top - 24}px`;
+      });
+
+      selectedObject.on("scaling", () => {
+        const newBound = selectedObject.getBoundingRect();
+        deleteBtn.style.left = `${newBound.left + newBound.width / 2 - 12}px`;
+        deleteBtn.style.top = `${newBound.top - 24}px`;
+      });
+    };
+
+    // 모바일 삭제 버튼 제거 함수
+    const removeMobileDeleteButton = () => {
+      const deleteBtn = wrapperRef.current?.querySelector(".mobile-delete-btn");
+      if (deleteBtn) {
+        deleteBtn.remove();
+      }
+    };
 
     // 객체가 캔버스 밖으로 나가지 않도록 제한
     canvas.on("object:moving", (e) => {
