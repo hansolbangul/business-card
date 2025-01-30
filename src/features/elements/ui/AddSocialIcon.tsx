@@ -77,6 +77,7 @@ export const AddSocialIcon = ({ close }: AddSocialIconProps) => {
       });
 
       canvas.add(group);
+      canvas.bringObjectForward(group, true); // 새로 추가된 아이콘을 맨 앞으로 가져옴
       canvas.setActiveObject(group);
       canvas.requestRenderAll();
       close();

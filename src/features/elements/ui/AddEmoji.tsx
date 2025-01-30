@@ -35,6 +35,7 @@ export const AddEmoji = ({ close }: AddEmojiProps) => {
     });
 
     canvas.add(text);
+    canvas.bringObjectForward(text, true); // 새로 추가된 이모지를 맨 앞으로 가져옴
     canvas.setActiveObject(text);
     canvas.renderAll();
     close();

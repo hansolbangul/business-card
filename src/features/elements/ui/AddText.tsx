@@ -11,21 +11,17 @@ export const AddText = () => {
   const handleAddText = () => {
     if (!canvas) return;
 
-    const text = new IText(`텍스트 ${textCount}`, {
-      left: 50 + textCount * 10,
-      top: 50 + textCount * 10,
+    const text = new IText("텍스트를 입력하세요", {
+      left: 10,
+      top: 10,
       fontSize: 20,
       fill: "#000000",
-      fontFamily: "Arial",
     });
 
-    textCount++;
-
     canvas.add(text);
+    canvas.bringObjectForward(text, true); // 새로 추가된 텍스트를 맨 앞으로 가져옴
     canvas.setActiveObject(text);
-    setActiveObject(text);
     text.enterEditing();
-    text.selectAll();
     canvas.renderAll();
   };
 
