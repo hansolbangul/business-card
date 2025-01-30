@@ -1,63 +1,69 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useCanvasStore } from "@/entities/canvas/model/store";
 import { IText } from "@/shared/lib/fabric";
-import { useEffect, useState } from "react";
 
 export const TextControls = () => {
   const { canvas, activeObject } = useCanvasStore();
-  const [textColor, setTextColor] = useState("#000000");
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
+  const [opacity, setOpacity] = useState(1);
 
-  // activeObject가 변경될 때마다 스타일 상태 업데이트
   useEffect(() => {
     if (activeObject && activeObject instanceof IText) {
-      setTextColor(activeObject.fill as string);
       setIsBold(activeObject.fontWeight === "bold");
       setIsItalic(activeObject.fontStyle === "italic");
       setIsUnderline(activeObject.underline || false);
+      setOpacity(activeObject.opacity || 1);
     }
   }, [activeObject]);
 
-  const updateTextStyle = (style: Partial<IText>) => {
-    if (!canvas || !activeObject || !(activeObject instanceof IText)) return;
-
-    // 스타일 업데이트
-    Object.assign(activeObject, style);
+  const updateTextStyle = (style: any) => {
+    if (!canvas || !activeObject) return;
     activeObject.set(style);
-    
-    // 캔버스 업데이트
-    canvas.requestRenderAll();
+    canvas.renderAll();
     activeObject.dirty = true;
   };
 
   if (!activeObject || !(activeObject instanceof IText)) {
-    return (
-      <div className="text-sm text-gray-500 text-center p-4">
-        텍스트를 선택하면 스타일을 변경할 수 있습니다.
-      </div>
-    );
+    return null;
   }
 
   return (
     <div className="space-y-4">
+      {/* 투명도 */}
+      <div className="flex items-center gap-2">
+        <label className="text-sm font-medium text-gray-600">투명도</label>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.1"
+          value={opacity}
+          onChange={(e) => {
+            const value = parseFloat(e.target.value);
+            setOpacity(value);
+            updateTextStyle({ opacity: value });
+          }}
+          className="w-32"
+        />
+      </div>
+
       {/* 색상 선택 */}
       <div className="space-y-2">
         <label className="text-sm font-medium text-gray-700">색상</label>
         <div className="flex items-center gap-2">
           <input
             type="color"
-            value={textColor}
-            onChange={(e) => {
-              const color = e.target.value;
-              setTextColor(color);
-              updateTextStyle({ fill: color });
-            }}
+            value={activeObject.fill as string}
+            onChange={(e) => updateTextStyle({ fill: e.target.value })}
             className="w-8 h-8 rounded border border-gray-200 p-0.5"
           />
-          <span className="text-sm text-gray-600">{textColor}</span>
+          <span className="text-sm text-gray-600">
+            {activeObject.fill as string}
+          </span>
         </div>
       </div>
 
@@ -67,9 +73,8 @@ export const TextControls = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => {
-              const newBold = !isBold;
-              setIsBold(newBold);
-              updateTextStyle({ fontWeight: newBold ? "bold" : "normal" });
+              setIsBold(!isBold);
+              updateTextStyle({ fontWeight: isBold ? "normal" : "bold" });
             }}
             className={`p-2 rounded ${
               isBold ? "bg-blue-100 text-blue-600" : "bg-white text-gray-600"
@@ -79,9 +84,8 @@ export const TextControls = () => {
           </button>
           <button
             onClick={() => {
-              const newItalic = !isItalic;
-              setIsItalic(newItalic);
-              updateTextStyle({ fontStyle: newItalic ? "italic" : "normal" });
+              setIsItalic(!isItalic);
+              updateTextStyle({ fontStyle: isItalic ? "normal" : "italic" });
             }}
             className={`p-2 rounded ${
               isItalic ? "bg-blue-100 text-blue-600" : "bg-white text-gray-600"
@@ -91,9 +95,8 @@ export const TextControls = () => {
           </button>
           <button
             onClick={() => {
-              const newUnderline = !isUnderline;
-              setIsUnderline(newUnderline);
-              updateTextStyle({ underline: newUnderline });
+              setIsUnderline(!isUnderline);
+              updateTextStyle({ underline: !isUnderline });
             }}
             className={`p-2 rounded ${
               isUnderline

@@ -6,6 +6,9 @@ import { useCanvasStore } from "@/entities/canvas/model/store";
 import { ContextMenu } from "@/shared/ui/ContextMenu";
 import { AnimatePresence } from "framer-motion";
 
+const CANVAS_WIDTH = 900;
+const CANVAS_HEIGHT = 500;
+
 export const CardEditor = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -26,26 +29,66 @@ export const CardEditor = () => {
     if (!canvasRef.current || !wrapperRef.current) return;
 
     const canvas = new Canvas(canvasRef.current, {
-      width: 900,
-      height: 500,
+      width: CANVAS_WIDTH,
+      height: CANVAS_HEIGHT,
       backgroundColor: "#ffffff",
     });
 
     fabricRef.current = canvas;
     setCanvas(canvas);
 
-    // 캔버스 클릭 시 컨텍스트 메뉴 닫기
-    canvas.on("mouse:down", () => {
-      setContextMenu({ x: 0, y: 0, visible: false });
+    // 캔버스 영역 밖 클릭 감지를 위한 이벤트 리스너
+    const handleGlobalClick = (e: MouseEvent) => {
+      if (!canvasRef.current) return;
+
+      const rect = canvasRef.current.getBoundingClientRect();
+      const clickedX = e.clientX - rect.left;
+      const clickedY = e.clientY - rect.top;
+
+      // 캔버스 영역 밖을 클릭했는지 확인
+      if (
+        clickedX < 0 ||
+        clickedX > CANVAS_WIDTH ||
+        clickedY < 0 ||
+        clickedY > CANVAS_HEIGHT
+      ) {
+        canvas.discardActiveObject();
+        setActiveObject(null);
+        canvas.requestRenderAll();
+      }
+    };
+
+    // 전역 클릭 이벤트 리스너 등록
+    document.addEventListener("mousedown", handleGlobalClick);
+
+    // 캔버스 클릭 이벤트 처리
+    canvas.on("mouse:down", (options) => {
+      const pointer = canvas.getPointer(options.e);
+      const clickedOutside = 
+        pointer.x < 0 || 
+        pointer.x > CANVAS_WIDTH || 
+        pointer.y < 0 || 
+        pointer.y > CANVAS_HEIGHT;
+
+      if (clickedOutside) {
+        canvas.discardActiveObject();
+        canvas.requestRenderAll();
+      }
     });
 
-    // 객체 선택 이벤트
+    // 객체 선택 이벤트에서 자동으로 앞으로 오는 기능 제거
     canvas.on("selection:created", (e) => {
-      setActiveObject(e.selected?.[0] || null);
+      const selectedObject = e.target;
+      if (selectedObject) {
+        setActiveObject(selectedObject);
+      }
     });
 
     canvas.on("selection:updated", (e) => {
-      setActiveObject(e.selected?.[0] || null);
+      const selectedObject = e.target;
+      if (selectedObject) {
+        setActiveObject(selectedObject);
+      }
     });
 
     canvas.on("selection:cleared", () => {
@@ -179,6 +222,7 @@ export const CardEditor = () => {
 
     return () => {
       canvas.dispose();
+      document.removeEventListener("mousedown", handleGlobalClick);
       if (canvasRef.current) {
         canvasRef.current.removeEventListener("wheel", handleWheel);
         canvasRef.current.removeEventListener("contextmenu", handleContextMenu);

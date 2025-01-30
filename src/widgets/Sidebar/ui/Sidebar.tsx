@@ -11,6 +11,8 @@ import { AddAsset } from "@/features/elements/ui/AddAsset";
 import { AddImage } from "@/features/elements/ui/AddImage";
 import { AddSocialIcon } from "@/features/elements/ui/AddSocialIcon";
 import { BackgroundControls } from "@/features/elements/ui/BackgroundControls";
+import { ImageControls } from "@/features/elements/ui/ImageControls";
+import { IText, FabricImage } from "@/shared/lib/fabric";
 
 export const Sidebar = () => {
   const openModal = (type: string) => {
@@ -40,7 +42,7 @@ export const Sidebar = () => {
           <div className="space-y-4">
             <AddText />
             <AddImage />
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => openModal("emoji")}
                 className="p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-900 flex flex-col items-center gap-2"
@@ -71,6 +73,7 @@ export const Sidebar = () => {
           <h2 className="text-lg font-semibold text-black">요소 컨트롤</h2>
           <div className="space-y-4">
             <TextControls />
+            <ImageControls />
             <LayerControls />
             <BackgroundControls />
           </div>
